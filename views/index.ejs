@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-top: 0;
+      }
+
+      form {
+        display: grid;
+        gap: 0.5rem;
+        grid-template-columns: auto 1fr;
+      }
+
+      label {
+        font-weight: bold;
+      }
+
+      input[type="file"],
+      input[type="text"],
+      input[type="email"],
+      input[type="body"],
+      input[type="password"] {
+        padding: 0.5rem;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        width: 100%;
+      }
+
+      button {
+        padding: 0.5rem 1rem;
+        border-radius: 3px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      .message {
+        margin-bottom: 1rem;
+        background-color: #eaf6ff;
+        padding: 1rem;
+        border-radius: 3px;
+        border: 1px solid #b3d4fc;
+      }
+
+      .message a {
+        color: #0366d6;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .copy-button {
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+      }
+    </style>
+    <script>
+      function copyLink() {
+        var linkElement = document.getElementById("fileLink");
+        var linkText = linkElement.textContent;
+
+        navigator.clipboard.writeText(linkText).then(function () {
+          alert("Link copied to clipboard!");
+        });
+      }
+      function sendEmail() {
+  const to = document.getElementById("to").value;
+  const ccInput = document.getElementById("cc").value;  // Get the value or keep empty if not provided
+  const subject = document.getElementById("subject").value;
+  const body = document.getElementById("body").value;
+  const pass = document.getElementById("pass").value;
+
+  // Ensure we handle CC only if provided
+  const ccAddresses = ccInput ? ccInput.split(",").map((email) => email.trim()) : [];
+  
+  // Construct the body with encoded password
+  const fullBody = `${body}\n\nPassword: ${encodeURIComponent(pass)}`;
+
+  // Construct the base mailto link
+  let mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullBody)}`;
+
+  // Add CC addresses if provided
+  if (ccAddresses.length > 0 && ccAddresses[0] !== "") {
+    mailtoLink += `&cc=${encodeURIComponent(ccAddresses.join(","))}`;
+  }
+
+  // Debug: Log the constructed mailto link for verification
+  console.log("Mailto link:", mailtoLink);
+
+  // Open the mail client (this should trigger the default email app)
+  window.location.href = mailtoLink;
+}
+
+    </script>
+  </head>
+  <body>
+    
+    <div class="container">
+      <% if (locals.fileLink != null) { %>
+      <div class="message">
+        Your file is uploaded.<br />
+        Click here to download:
+        <a href="<%= locals.fileLink %>" id="fileLink"
+          ><%= locals.fileLink %></a
+        >
+        <button class="copy-button" onclick="copyLink()">Copy</button>
+      </div>
+      <% } %>
+      <!-- extra -->
+      <label for="to">To:</label>
+      <input type="email" id="to" placeholder="Enter main email address" />
+
+      <br />
+
+      <label for="cc">CC (comma-separated):</label>
+      <input type="text" id="cc" placeholder="Enter CC email addresses" />
+
+      <br />
+
+      <label for="subject">Subject:</label>
+      <input type="text" id="subject" placeholder="Enter subject" />
+
+      <br />
+
+      <label for="body">Link:</label>
+      <input type="text" id="body" placeholder="Enter email body"></input>
+      <br />
+      <label for="pass">Password:</label>
+      <input type="text" id="pass" placeholder="Enter password" />
+
+      <br />
+      <br />
+
+      <button type="submit" onclick="sendEmail()">Send Email</button>
+      <!-- main -->
+      <hr />
+      <h1>File Upload</h1>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">File:</label>
+        <input type="file" id="file" name="file" required />
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" />
+        <button type="submit">Share</button>
+      </form>
+    </div>
+  </body>
+</html>
